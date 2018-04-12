@@ -1,8 +1,13 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import Header from './components/common/Header';
+import List from './components/list/list';
 import './index.css';
 // Functional Component
+// Components defined as classes have some additional features.. such as 
+//"Component Local State"
+//What is React State, it is an object that determines how our 
+//components renders and behaves. Create dynamic and interactive components.
 
 const App = ()=>{
 
@@ -11,6 +16,7 @@ const App = ()=>{
             <div>
                 <Header />
                 <h1> React Coin {smiley} </h1>
+                <List/>
              </div>
     )   
         // <h1 className = "classname"></h1>
