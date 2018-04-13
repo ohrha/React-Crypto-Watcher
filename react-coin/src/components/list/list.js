@@ -1,7 +1,9 @@
 import React from 'react';
 import { handleResponse } from '../../helpers';
 import { API_URL } from '../../config';
+import Table from './Table';
 import loading from '../common/loading';
+import Pagination from './Pagination';
 import './Table.css';
 //Inside curly braces because we don't export it by 
 //to default from helpers file..
@@ -21,8 +23,11 @@ class List extends React.Component {
             loading: false,
             currencies: [],
             error: null,
+            totalPages: 0,
+            page: 1
 
         };
+        this.handlePaginationClick = this.handlePaginationClick.bind(this);
     }
     //React Class Components have lifecycle methods which allow one to run
     //code at a particular time. Methods prefixed with will, are called right before
@@ -48,8 +53,14 @@ class List extends React.Component {
     //This method is called immediately after a component is mounted. Ajax calls
     //adding event listeners, and manipulating the DOM is...
     componentDidMount() {
+        this.fetchCurrencies();
+    }
+
+    fetchCurrencies(){
+        
+        const { page } = this.state;
         this.setState({ loading: true });
-        fetch(`${API_URL}/cryptocurrencies?page=1&perPage=20`) //ES6 template literal
+        fetch(`${API_URL}/cryptocurrencies?page=${page}&perPage=20`) //ES6 template literal
             .then(handleResponse
             /*  return response.json().then(json => { // Converts response object to JSON object.
                   return response.ok ? json : Promise.reject(json);// Then checks whether response was successful.
@@ -60,8 +71,12 @@ class List extends React.Component {
             //In Helpers.js
             )
             .then((data) => {
+                const {currencies, totalPages } = data;
                 this.setState({
-                    currencies: data.currencies,
+                    //In ES6 when the key/value of an object literal are equivalent, you can refactor like so..
+                    currencies,
+                    //is equal to...
+                    totalPages: totalPages,
                     loading: false
                 })
                 console.log('Success', data);
@@ -74,23 +89,30 @@ class List extends React.Component {
                 //console.log('Error', error);
             });
 
+
     }
+    handlePaginationClick (direction){
 
-    //custom method
-    renderChangePercent(percent){
+        let nextPage = this.state.page;
+        nextPage = direction === 'next' ? nextPage + 1:nextPage -1;
+        this.setState({page:nextPage},()=>{
+            //Make sure setState has updated...
+            this.fetchCurrencies();
 
-        if(percent>0){
-            return <span className="percent-raised">{percent}% &uarr;</span>
-        }else if(percent < 0){
-            return <span className = "percent-fallen">{percent}% &darr;</span>
+        });
+        /*if(direction === "next"){
+
+            nextPage++;
+
         }else{
-           return  <span>{percent}</span>
-        }
 
-    }
+            nextPage --
+        }*/
+    }    //custom method
+  
     render() {
         //ES6 MAGIC
-        const { loading,error,currencies } = this.state;
+        const { loading, error, currencies,page, totalPages } = this.state;
         /* Same as...
         const loading = this.state.loading;
         const error = this.state.error;
@@ -98,49 +120,27 @@ class List extends React.Component {
         */
         if (loading) {
 
-            return <div className = "loading-container"><loading /></div>
+            return <div className="loading-container"><loading /></div>
 
         }
-        if(error){
-            return <div className = "error">{error}</div>
+        if (error) {
+            return <div className="error">{error}</div>
         }
         return (
-            <div className="Table-container">
 
-                <table className="Table">
-                    <thead className="Table-head">
-                        <tr>
-                            <th>Cryptocurrency</th>
-                            <th>Price</th>
-                            <th>Market Cap</th>
-                            <th>24hr Change</th>
-                        </tr>
-                    </thead>
-                    <tbody className="Table-body">
-                        {
-                            this.state.currencies.map((currency) => (
-                                <tr key={currency.id}>
-                                    <td>
-                                        <span className="Table-rank">{currency.rank}</span>
-                                        {currency.name}
-                                    </td>
-                                    <td>
-                                        <span className="Table-dollar">${currency.price}</span>
-                                    </td>
-                                    <td>
-                                        <span className="Table-dollar">${currency.marketCap}</span>
-                                    </td>
-                                    <td>
-                                        {this.renderChangePercent(currency.percentChange24h)}
-                                    </td>
-                                </tr>
-                            ))
-                        }
-                        </tbody>
+            // We need to pass loading, currencies, and error to the "Table" component.
+            //Remember react can only return one parent component...Must wrap in div.
+            <div>
 
-                </table>
+                <Table
+                   /* renderChangePercent={this.renderChangePercent}*/
+                    currencies={currencies} />
+                <Pagination 
+                    page = {page}
+                    totalPages = {totalPages}
+                    handlePaginationClick = {this.handlePaginationClick}/>
             </div>
-                    )
+        )
         // Warning, each child in an array or iterator should have a
         // unique 'key" prop", check the render method.
         //Everytime you loop through an object, you should give a unique 
