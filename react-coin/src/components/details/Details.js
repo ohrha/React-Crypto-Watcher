@@ -25,8 +25,25 @@ class Details extends React.Component {
     }
 
     componentDidMount() {
+        console.log("component has been mounted", this.props)
         const currencyId = this.props.match.params.id;
-        this.setState({ loading: true })
+       this.fetchCurrency(currencyId);
+
+    }
+    //Lifecycle hook/method that will detect and update of the component.
+    componentWillReceiveProps(nextProps){
+
+        console.log("component has beeen updated", nextProps)
+
+        if(this.props.location.pathname !== nextProps.location.pathname){
+            //Get new currency id from url
+            const newCurrencyId = nextProps.match.params.id;
+            this.fetchCurrency(newCurrencyId);
+
+        }
+    }
+    fetchCurrency(currencyId){
+         this.setState({ loading: true })
 
         console.log(currencyId)
         fetch(`${API_URL}/cryptocurrencies/${currencyId}`)
