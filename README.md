@@ -1,9 +1,9 @@
-# Learn React by building a web app
+# Crypto Currency Watcher W/React
 
 Starter files for the <a href="https://udilia.com/courses/learn-react-by-building-a-web-app">Learn React by building a web app</a> Course.
 
 <img src="https://udilia.com/images/react-coin-poster.jpg" alt="Poster" width="600" />
-
+<a href-"https://coinwatchreactor.herokuapp.com/">Check it out!</a>
 # Project structure
 
 `react-coin` is the folder, where we are going to work for this entire course.
